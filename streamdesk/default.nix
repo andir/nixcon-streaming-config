@@ -15,6 +15,24 @@
       } ''
           cp -rv $src/plugins/decklink/linux/decklink-sdk $out
       '';
+      blackmagic-desktop-video = super.blackmagic-desktop-video.overrideAttrs ({ postInstall ? "", buildInputs ? [], ... }: {
+        buildInputs = buildInputs ++ [
+          self.fontconfig
+          self.freetype
+          self.xorg.libXrender
+          self.xorg.libICE
+          self.xorg.libSM
+          self.qt5.qtbase
+          self.qt5.wrapQtAppsHook
+        ];
+        postInstall = ''
+          ${postInstall}
+          find $unpacked
+          cp $unpacked/usr/lib/blackmagic/DesktopVideo/BlackmagicDesktopVideoSetup $out/bin
+          mkdir $out/DesktopVideo
+#          cp -r $unpacked/usr/lib/blackmagic/DesktopVideo/* $out/DesktopVideo
+        '';
+      });
     })
   ];
   
