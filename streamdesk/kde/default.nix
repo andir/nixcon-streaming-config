@@ -9,6 +9,19 @@
     };
   };
 
+
+  services.pipewire = {
+    enable = true;
+    audio.enable = false;
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+    ];
+  };
+    
+
   programs.kde-pim.enable = false;
     security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {

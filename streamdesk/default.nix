@@ -46,6 +46,14 @@
     pciutils
 
     blackmagic-desktop-video
+    scarlett2
+    alsa-scarlett-gui
+
+    mpv
+    vlc
+    audacity
+    
+    pavucontrol
 
     (ffmpeg_7-full.overrideAttrs ({ buildInputs, configureFlags, postFixup ? "", nativeBuildInputs ? [], ... }: {
       buildInputs = buildInputs ++ [ blackmagic-desktop-video ];
@@ -58,9 +66,14 @@
         wrapProgram $bin/bin/ffplay --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
       '';
     }))
+
     inkscape
     gimp
   ];
+
+  services.syncthing = {
+    enable = true;
+  };
 
   # VM guest additions to improve host-guest interaction
   services.spice-vdagentd.enable = true;
