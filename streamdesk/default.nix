@@ -6,6 +6,7 @@
     ./decklink
     ./kde
     ./companion
+    ./disks.nix
   ];
 
   nixpkgs.overlays = [
@@ -35,7 +36,7 @@
       });
     })
   ];
-  
+
   environment.systemPackages = with pkgs; [
     git
     firefox
@@ -52,7 +53,7 @@
     mpv
     vlc
     audacity
-    
+
     pavucontrol
 
     tmux

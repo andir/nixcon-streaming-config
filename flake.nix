@@ -1,9 +1,12 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  outputs = { self, nixpkgs, ... }: {
+  inputs.disko.url = "github:nix-community/disko";
+  # nix run github:nix-community/nixos-anywhere -- --flake <path to configuration>    #<configuration name> --vm-test
+  outputs = { self, nixpkgs, disko, ... }: {
     nixosConfigurations.streamdesk = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
+        disko.nixosModules.disko
         ./streamdesk
       ];
     };
