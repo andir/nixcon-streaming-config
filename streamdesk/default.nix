@@ -55,6 +55,13 @@
     
     pavucontrol
 
+    tmux
+    htop
+    btop
+    atop
+    usbutils
+    utillinux
+
     (ffmpeg_7-full.overrideAttrs ({ buildInputs, configureFlags, postFixup ? "", nativeBuildInputs ? [], ... }: {
       buildInputs = buildInputs ++ [ blackmagic-desktop-video ];
       nativeBuildInputs = nativeBuildInputs ++ [ pkgs.makeWrapper ];
@@ -106,8 +113,9 @@
     # Add Memtest86+ to the CD.
     boot.loader.grub.memtest86.enable = true;
 
+  };
     # Use less privileged nixos user
-    users.users.nixos = {
+  users.users.nixos = {
       isNormalUser = true;
       extraGroups = [
         "wheel"
@@ -116,7 +124,22 @@
       ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
-    };
+      openssh.authorizedKeys.keys = [
+        "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIEPPocCK4JCbFWshVHMgICOm61LC6V2JAXThzKjXv7TSAAAABHNzaDo="
+"ssh-rsa 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"
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqEC14KDw/v+MzxnUENxfg3BUlr65+1EB4rDq3TVkw5"
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAsVWVWU1e6E91OQpFaqGtXamZKPSlSbTk0uVLjgUyRe"
+"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDg4HZ7w98KbQ6o+0YlURQSFG+3K2kVQEJTpk0RCPprjj/N/8TfLEKrqgKFEnJtvrtBBwUpXzfUBx4Qi55VfQtVTbMsLMsO41x3PU2BoybrdQroaCv/vHntCcP9FMOw4Fm5TZVWdJ4PR+VPOXNu6fmmGhiEDAqSDnlZ9IMVAsdsYqC8twY7L87Sg9LhR5gecvjYkU6XZudQQeaqT3JWlBNdWFfwNZ1HXShI6p74UjRpUmmfSo8qWm0coWOSjK7r8bTQuj5+CzzWTUP5j9JVdwfkkRgpZT+6pITtsp3xllGVbnbe5k2fMoyWfLbtuKebf2ZecBXLDaNTN1PbviaW9+M36aXlMovLcaxrR2sWHWUn1qSIVEOk4IiLS4Zpk7ldlvuIEz0Wp+w6QGt+t89DnX1vV293759mbENG70VtHpK0HW+8+aqB+Ch3IHrxwj5tRI509gSh3znkkX/C3kPduWtE0c9LQW9Qrz3lNBov2BeZOpu0UoN7HZQHtt2odcsL9IvjnjPwlqtnutc5QmJt+EzTiIAkrc6DRwjsN4eGHIzzL+LC6r0wt7MaS/R3saKYJ5XWBzKPkKgrttvOHJRBpP6tpn7zgolX92wtgOe4fRH+Wbx4Ecf+A10vbzcId57X5bFvSUqE9OgcK9fZROrwdtrO+uiRyO7YJh8OFONsu1pzGQ=="
+"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCmJjhI2XKdFEO6NXCOp1OvYpY3xtN2sjrTAXHp7whS2cSp31FNGtZPNLxJc8JLe3lFWe+JymxHlCHQYkM7ewf1jmtsk4kuTkzN0jlU2Dx4gPOFVpM1KFmPwRwUjwn4od2gfb+uY8c/3+BcfHHC1UMneltkPOsPfsCKTmLFmLzqTCZchzvWn2NapcJaQuLS3CeX3w+yV5/YtJ3CEkTET4nTrR38BF6TvlExB2HD77FcZJGkK/7H3KRxOzVa4R0W4+a1Ty5XocBSgfGR9DBHkvKWQZErgk5A8y89wFRazEHIGFrKq3t9veag3sa120dJzuw6A7sZpkyYsM5R+bgy9uaWsckRMxwgKG0cWEJU+s88Otef2NDEgA9HhADk9WKe3gMtOe6uqW68jwqi6fFkQGCb8+QkIqlNuiEGdvO/pJcFTmnWyFGUpi5ovydNuXtdo2cXnK0srJNFHNsipu3hhnESYUMBB566SgDygGJTPxfRuTO6rJ07Ui879LzsfZCYOfVX9APVDvt/3isuSBAY2mOncH4PzQJ8EBuj42tEFCYWc9m4jEOfYX+mgtg8HztGwIAILWTDV66KV/D29HWB4+rEVrJfKljlWnXYodk0sxKxDbDVBtKVZI205/T9oTR9h4eAYwqIpQzBJM3BxvMhAi1rMGB7dbLNzId8UPPqo8TS6w== andi@wrt"
+"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDX0hp8fCemYRxK7Um39wAvUj1wRzAuJfr/DHak2DYGISqm0IbVdeUO5PKsfczLUIWnUi53TqdUAdGLGCPfG0+XF02f6TEl7wUP4a1zAxxAYBVj12dAMtFRVD6f8F3qzHE5PXi9cM6rpSFX4xJw3CmNXIqt7BODtqN5nX2m4Cd00GZILup1RoKlOKmGl9L+2seP8Dp3kxdIAg9VwGUpI/kZyjH547IysEugy78mKQAEPzudLj5ILHSojogWmpfCooM406TeIBAHmXXb93yuyfnoewuAOK2jY+Q6wswZX07sJNHzD1lkY+qBscyBJEeztNRew4ZlxI8jDI4qk57KZR/zUjn1WzoBqoELcmBCZToD8+nB9z7B3TMBnByCgSxbBlEpnr+6vq6nDmZA9vHoB/w4vL4jTYBqV2qpatOanWvXk69VWo9g0ixaKVlVWGdAyaU16dTuV5Ssn5ZSEKcDOJlGiEzwuk00EtdfIYeuQ/uzcMmM+8qICJgbhgcJtPRAcdQ8D8iH8lN3gckG7/aRn0j33Qvb9CHxT2nS+Z1cxVaNuFi6FEeKlTdrhiDu8lVD2qvQH5FtwUjRzmRJz52HgDdiGBPGG6noq041ZUQ8/xCbfyI+SrH8x+5PCRxa4+reJP5KMBAHolZa+Rv+5+hQ0A3d3ZvQiWyayhH5f+etTESFFQ== cardno:000609701669"
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPqpqC3YXnoh+2fgOWbjCoOSnBv93+K9rpYSg0DuNIq7 andi@ranzbook"
+"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMJqyWKhVxfIDDGJRJ1f/Jn1IpasWy5F1jmE7g8Q3jL5G+tq1bSpH1OCaChPR1Ay4LKPYH70I/TyE7zibr5wDPo= ecdsa-sha2-nistp256"
+"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHv//ks23SGV1+5IRcGF8l6nD90eQC1T2+baysTjOtgHifRYuxrbgMqYxmTOUIHHJZrZIRtMTNPIr3ompuc8dr4= new-ssh-key-:(@secretive.KT-MAC-MVY76QW02T.local"
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMza5XPqhxrs6fVVXzzFIKQ80qYMYl/zaxNtgIwjGhoo andi@gamma"
+"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ+EdAVdJU+MV9fNjC+mRPIv3EzR9E6Zoc7VGQNRwCqP andi@delta"
+      ];
+  };
+  services.openssh.enable = true;
 
     # Allow the user to log in as root without a password.
     users.users.root.initialHashedPassword = "";
@@ -132,7 +155,8 @@
 
     # Automatically log in at the virtual consoles.
     services.getty.autologinUser = "nixos";
-  };
+
+
   # TODO:
   # * disable screensaver
   # * disable suspend to disk
