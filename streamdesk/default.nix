@@ -6,7 +6,6 @@
     ./decklink
     ./kde
     ./companion
-    ./disks.nix
   ];
 
   nixpkgs.overlays = [
