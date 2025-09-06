@@ -8,6 +8,15 @@
     ./companion
   ];
 
+  nix.settings = {
+    keep-derivations = true;
+    keep-outputs = true;
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+  };
+
   nixpkgs.overlays = [
     (self: super: {
       decklink-sdk = super.runCommand "decklink-sdk" {
@@ -36,7 +45,11 @@
     })
   ];
 
+  services.nixseparatedebuginfod.enable = true;
+
   environment.systemPackages = with pkgs; [
+    gdb
+
     git
     firefox
     chromium
