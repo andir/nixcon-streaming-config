@@ -9,7 +9,6 @@
     });
     plugins = with pkgs.obs-studio-plugins; [
       obs-source-record
-      obs-webkitgtk
     ];
   };
 }
