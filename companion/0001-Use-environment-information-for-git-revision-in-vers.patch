@@ -1,0 +1,43 @@
+From 4a19885fcbea05e6b2c3dc46ea612c0a6a554e4e Mon Sep 17 00:00:00 2001
+From: Andreas Rammhold <andreas@rammhold.de>
+Date: Sun, 14 Sep 2025 16:53:43 +0200
+Subject: [PATCH 1/2] Use environment information for git revision in version
+ string
+
+---
+ tools/lib.mts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/tools/lib.mts b/tools/lib.mts
+index d529e4d9..35bac0ee 100644
+--- a/tools/lib.mts
++++ b/tools/lib.mts
+@@ -4,6 +4,12 @@ import { $, fs } from 'zx'
+ process.env.FNM_LOGLEVEL = 'quiet'
+ 
+ export async function generateVersionString() {
++	const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
++	const packageJson = JSON.parse(packageJsonStr.toString())
++	const packageVersion = packageJson.version
++
++        return `${packageVersion}-nix-${process.env.NIX_SRC_REV}`
++
+ 	return goSilent(async () => {
+ 		const headHashRaw = await $`git rev-parse --short=10 HEAD`
+ 		const headHash = headHashRaw.stdout.trim()
+@@ -31,6 +37,12 @@ export async function generateVersionString() {
+ }
+ 
+ export async function generateMiniVersionString() {
++	const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
++	const packageJson = JSON.parse(packageJsonStr.toString())
++	const packageVersion = packageJson.version
++
++        return `${packageVersion}-nix-${process.env.NIX_SRC_REV}`
++
+ 	return goSilent(async () => {
+ 		const packageJsonStr = await fs.readFile(new URL('../package.json', import.meta.url))
+ 		const packageJson = JSON.parse(packageJsonStr.toString())
+-- 
+2.51.0
+

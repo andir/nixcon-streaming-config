@@ -1,0 +1,27 @@
+From 60dfca5d563a5b3d8611025fd5bea0a91cae5ad9 Mon Sep 17 00:00:00 2001
+From: Andreas Rammhold <andreas@rammhold.de>
+Date: Mon, 15 Sep 2025 21:58:24 +0200
+Subject: [PATCH 2/2] Remove binary copying
+
+---
+ tools/build/dist.mts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/build/dist.mts b/tools/build/dist.mts
+index e1f31c13..1225ace1 100644
+--- a/tools/build/dist.mts
++++ b/tools/build/dist.mts
+@@ -131,8 +131,8 @@ for (const name of copyPrebuildsFromDependencies) {
+ }
+ 
+ // Make sure the correct sqlite3 prebuild is installed, and copy it to the output
+-await $`yarn --cwd node_modules/better-sqlite3 prebuild-install --arch=${platformInfo.nodeArch}`
+-await fs.copy('node_modules/better-sqlite3/build/Release/better_sqlite3.node', 'dist/prebuilds/better_sqlite3.node')
++//await $`yarn --cwd node_modules/better-sqlite3 prebuild-install --arch=${platformInfo.nodeArch}`
++//await fs.copy('node_modules/better-sqlite3/build/Release/better_sqlite3.node', 'dist/prebuilds/better_sqlite3.node')
+ 
+ // Copy fonts
+ await fs.mkdirp('dist/assets/Fonts')
+-- 
+2.51.0
+

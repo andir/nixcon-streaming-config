@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "companion": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1752582229,
+        "narHash": "sha256-sr3sV9sbguHuQlJClwNPa8fnozi7Zo5d8vREy3dRRVc=",
+        "owner": "bitfocus",
+        "repo": "companion",
+        "rev": "d4d38029eaec55cc86f9c6fe00a35e1955d2c56f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bitfocus",
+        "ref": "stable-4.0",
+        "repo": "companion",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -34,6 +51,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-2505": {
+      "locked": {
+        "lastModified": 1757020766,
+        "narHash": "sha256-PLoSjHRa2bUbi1x9HoXgTx2AiuzNXs54c8omhadyvp0=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "fe83bbdde2ccdc2cb9573aa846abe8363f79a97a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1756787288,
@@ -52,8 +85,10 @@
     },
     "root": {
       "inputs": {
+        "companion": "companion",
         "disko": "disko",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "nixpkgs-2505": "nixpkgs-2505"
       }
     }
   },
