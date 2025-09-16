@@ -35,6 +35,24 @@
         "type": "github"
       }
     },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1757997814,
+        "narHash": "sha256-F+1aoG+3NH4jDDEmhnDUReISyq6kQBBuktTUqCUWSiw=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "5820376beb804de9acf07debaaff1ac84728b708",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1752596105,
@@ -69,6 +87,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1757745802,
+        "narHash": "sha256-hLEO2TPj55KcUFUU1vgtHE9UEIOjRcH/4QbmfHNF820=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1756787288,
         "narHash": "sha256-rw/PHa1cqiePdBxhF66V7R+WAP8WekQ0mCDG4CFqT8Y=",
         "owner": "nixos",
@@ -83,12 +117,31 @@
         "type": "github"
       }
     },
+    "ontime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1757305419,
+        "narHash": "sha256-hQ9kz+iMaMMHs8iHXxhxk42RPH5kOAo1EoOZB4eoolw=",
+        "owner": "cpvalente",
+        "repo": "ontime",
+        "rev": "0057b4a3f1d561412e2ba2af3432287d0c52f340",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cpvalente",
+        "ref": "v4",
+        "repo": "ontime",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "companion": "companion",
         "disko": "disko",
-        "nixpkgs": "nixpkgs_2",
-        "nixpkgs-2505": "nixpkgs-2505"
+        "home-manager": "home-manager",
+        "nixpkgs": "nixpkgs_3",
+        "nixpkgs-2505": "nixpkgs-2505",
+        "ontime": "ontime"
       }
     }
   },

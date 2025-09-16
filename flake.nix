@@ -2,25 +2,37 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.nixpkgs-2505.url = "github:nixos/nixpkgs/nixos-25.05";
   inputs.disko.url = "github:nix-community/disko";
+  inputs.home-manager.url = "github:nix-community/home-manager";
   inputs.companion = {
     url = "github:bitfocus/companion/stable-4.0";
     flake = false;
   };
-  outputs = { self, nixpkgs, nixpkgs-2505, disko, companion, ... }: let
+  inputs.ontime = {
+    url = "github:cpvalente/ontime/v4";
+    flake = false;
+  };
+  outputs = { self, nixpkgs, nixpkgs-2505, disko, companion, ontime, home-manager, ... }: let
 
-    mkSystemConfig = { nixpkgs, hardwareConfig ? null }: nixpkgs.lib.nixosSystem {
+    mkSystemConfig = { nixpkgs, hardwareConfig ? null, diskConfig ? null }: nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./streamdesk
         disko.nixosModules.disko
-        ./disk-config.nix
-#        ./hardware-configuration.nix
-      ];
+        home-manager.nixosModules.home-manager
+        ({
+          nixpkgs.overlays = [(_: _: {
+            ontime = self.packages.ontime.x86_64-linux.runScript;
+          })];
+        })
+      ] ++ (if hardwareConfig != null then [ hardwareConfig ] else [])
+      ++ (if diskConfig != null then [ diskConfig ] else [])
+      ;
     };
   in {
-    nixosConfigurations.streamdesk = mkSystemConfig { inherit nixpkgs; hardwareConfig = ./hardware-config.nix; };
+    nixosConfigurations.streamdesk = mkSystemConfig { inherit nixpkgs; hardwareConfig = ./hardware-config.nix; diskConfig = ./disk-config.nix; };
     nixosConfigurations.streamdeskNoHW = mkSystemConfig { inherit nixpkgs; };
     nixosConfigurations.streamdeskStableNoHW = mkSystemConfig { nixpkgs = nixpkgs-2505; };
+    packages.vm.x86_64-linux = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.vm;
     packages.liveCD.x86_64-linux = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.images.iso;
     packages.liveCDStable.x86_64-linux = self.outputs.nixosConfigurations.streamdeskStableNoHW.config.system.build.images.iso;
     packages.default.install = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (arch: nixpkgs.legacyPackages.${arch}.writeScriptBin "install" ''
@@ -43,6 +55,43 @@
         ];
       };
     });
+    packages.ontime = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: with nixpkgs.legacyPackages.${arch}; stdenv.mkDerivation (finalAttrs: {
+      pname = "ontime";
+      version = "4-nix-${ontime.rev}";
+      src = ontime;
+      nativeBuildInputs = [
+        nodejs
+        pnpm
+        pnpm.configHook
+      ];
+      pnpmDeps = pnpm.fetchDeps {
+          inherit (finalAttrs) pname version src;
+          fetcherVersion = 2;
+          hash = "sha256-8B0MbVDH8jLOXxtm4aqBux/swW6vY0ixpV5oU5IHsm4=";
+      };
+      env = {
+        ELECTRON_SKIP_BINARY_DOWNLOAD = true;
+        NODE_ENV = "prod";
+      };
+      buildPhase = ''
+        (cd apps/client && pnpm addversion && pnpm build)
+        (cd apps/server && pnpm addversion && pnpm build:docker)
+        mkdir -p $out
+        cp -rv apps/client/build $out/client
+
+        cp -rv apps/server/dist $out/server
+        cp -rv apps/server/src/external $out/external
+        cp -rv apps/server/src/html $out/html
+      '';
+
+      testPhase = ''
+        node $out/server/index.cjs --help
+      '';
+      passthru.runScript = writeShellScriptBin "ontime" ''
+        cd ${self.packages.ontime.${arch}}
+        exec ${nodejs}/bin/node server/docker.cjs "$@"
+      '';
+    }));
 
     packages.companion = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: with nixpkgs.legacyPackages.${arch}; let
       yarn-berry = yarn-berry_4;

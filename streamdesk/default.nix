@@ -6,6 +6,8 @@
     ./decklink
     ./kde
     ./companion
+    ./ontime.nix
+    ./home.nix
   ];
 
   nix.settings = {
