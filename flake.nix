@@ -47,7 +47,13 @@
     devShells = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: {
       default =  with nixpkgs.legacyPackages.${arch}; mkShell {
         nativeBuildInputs = [
-          
+          ffmpeg_7-full
+          (python3.withPackages (p: [
+            p.google-api-python-client
+            p.google-auth
+            p.google-auth-httplib2
+            p.google-auth-oauthlib
+          ]))
           (writeShellScriptBin "update-companion" ''
             mkdir -p companion
             exec ${yarn-berry_4.yarn-berry-fetcher}/bin/yarn-berry-fetcher missing-hashes ${companion}/yarn.lock > companion/missing-hashes.json
