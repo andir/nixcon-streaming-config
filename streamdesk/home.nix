@@ -2,7 +2,7 @@
   home-manager = {
     useGlobalPkgs = true;
     users.nixos = {
-      home.stateVersion = "25.05";
+      home.stateVersion = "26.05";
 
       # ensure KDE doesn't ever go to sleep, disable active corners, ....
       qt.kde.settings = {

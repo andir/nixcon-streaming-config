@@ -6,7 +6,7 @@
     ./decklink
     ./kde
     ./companion
-    ./ontime.nix
+#    ./ontime.nix
     ./home.nix
   ];
 
@@ -47,7 +47,7 @@
     })
   ];
 
-  services.nixseparatedebuginfod.enable = true;
+  services.nixseparatedebuginfod2.enable = true;
 
   environment.systemPackages = with pkgs; [
     gdb
@@ -75,7 +75,7 @@
     btop
     atop
     usbutils
-    utillinux
+    util-linux
 
     (ffmpeg_7-full.overrideAttrs ({ buildInputs, configureFlags, postFixup ? "", nativeBuildInputs ? [], ... }: {
       buildInputs = buildInputs ++ [ blackmagic-desktop-video ];
@@ -118,6 +118,7 @@
   boot.plymouth.enable = true;
 
   hardware.enableAllHardware = true;
+  hardware.hwsCapture.enable =true;
   image.modules.iso = {
     # EFI booting
     isoImage.makeEfiBootable = true;
