@@ -1,8 +1,11 @@
 {
   home-manager = {
     useGlobalPkgs = true;
+
     users.nixos = {
       home.stateVersion = "26.05";
+
+      imports = [ ./companion-satellite.rs ];
 
       # ensure KDE doesn't ever go to sleep, disable active corners, ....
       qt.kde.settings = {
@@ -32,18 +35,18 @@
         kwinrc = {
           Effect-overview.BorderActivate = 9;
           Plugins = {
-            fadingpopupsEnabled=false;
-            fullscreenEnabled=false;
-            loginEnabled=false;
-            logoutEnabled=false;
-            maximizeEnabled=false;
-            overviewEnabled=false;
-            scaleEnabled=false;
-            screenedgeEnabled=false;
-            slideEnabled=false;
-            slidingpopupsEnabled=false;
-            squashEnabled=false;
-            windowapertureEnabled=false;
+            fadingpopupsEnabled = false;
+            fullscreenEnabled = false;
+            loginEnabled = false;
+            logoutEnabled = false;
+            maximizeEnabled = false;
+            overviewEnabled = false;
+            scaleEnabled = false;
+            screenedgeEnabled = false;
+            slideEnabled = false;
+            slidingpopupsEnabled = false;
+            squashEnabled = false;
+            windowapertureEnabled = false;
           };
           Tiling.padding = 4;
           Windows = {
@@ -56,7 +59,7 @@
           AC.Display = {
             DimDisplayIdleTimeoutSec = -1;
             DimDisplayWhenIdle = false;
-            TurnOffDisplayIdleTimeoutSec= -1;
+            TurnOffDisplayIdleTimeoutSec = -1;
             TurnOffDisplayWhenIdle = false;
           };
           AC.SuspendAndShutdown = {
@@ -72,36 +75,39 @@
           bookmarks = {
             force = true;
             settings = [
-            {
-              name = "Ontime";
-              tags = ["ontime" "time"];
-              keyword = "ontime";
-              url = "http://localhost:4001/editor";
-            }
-            "separator"
-            {
-              name = "Pads";
-              tags = ["pad" ];
-              keyword = "pads";
-              url = "https://pad.lassul.us/nixcon-2025-av";
-            }
-            "separator"
-            {
-              name = "Syncthing";
-              tags = ["Syncthing" ];
-              keyword = "syncthing";
-              url = "http://localhost:8384";
-            }
+              {
+                name = "Ontime";
+                tags = [
+                  "ontime"
+                  "time"
+                ];
+                keyword = "ontime";
+                url = "http://localhost:4001/editor";
+              }
+              "separator"
+              {
+                name = "Pads";
+                tags = [ "pad" ];
+                keyword = "pads";
+                url = "https://pad.lassul.us/nixcon-2025-av";
+              }
+              "separator"
+              {
+                name = "Syncthing";
+                tags = [ "Syncthing" ];
+                keyword = "syncthing";
+                url = "http://localhost:8384";
+              }
             ];
           };
         };
         policies = {
           ExtensionSettings = {
             "uBlock0@raymondhill.net" = {
-                default_area = "menupanel";
-                install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-                installation_mode = "force_installed";
-                private_browsing = true;
+              default_area = "menupanel";
+              install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+              installation_mode = "force_installed";
+              private_browsing = true;
             };
           };
         };

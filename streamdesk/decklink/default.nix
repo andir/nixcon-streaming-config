@@ -5,7 +5,7 @@
   services.pipewire = {
     audio.enable = false;
     alsa.enable = false;
-    pulse.enable =false;
+    pulse.enable = false;
   };
   services.pulseaudio.enable = true;
 }

@@ -2,168 +2,125 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.nixpkgs-2605.url = "github:nixos/nixpkgs/nixos-26.05";
   inputs.disko.url = "github:nix-community/disko";
+  inputs.home-manager-2605.url = "github:nix-community/home-manager/release-26.05";
   inputs.home-manager.url = "github:nix-community/home-manager";
+  inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
   inputs.hws.url = "path:/home/andi/dev/private/unisheen-capture-card/unisheen";
-#  inputs.companion = {
-#    url = "github:bitfocus/companion/stable-4.0";
-#    flake = false;
-#  };
-#  inputs.ontime = {
-#    url = "github:cpvalente/ontime/v4";
-#    flake = false;
-#  };
-  outputs = { self, nixpkgs, nixpkgs-2605, disko,
-              hws,
-             # ontime,
-              home-manager, ... }: let
-
-    mkSystemConfig = { nixpkgs, hardwareConfig ? null, diskConfig ? null }: nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        hws.nixosModules.default
-        ./streamdesk
-        disko.nixosModules.disko
-        home-manager.nixosModules.home-manager
-        ({
-          nixpkgs.overlays = [(_: _: {
-            #ontime = self.packages.ontime.x86_64-linux.runScript;
-          })];
-        })
-      ] ++ (if hardwareConfig != null then [ hardwareConfig ] else [])
-      ++ (if diskConfig != null then [ diskConfig ] else [])
-      ;
+  inputs.companion-satellite-rs =
+    {
+      url = "git+https://forgejo.rammhold.de/nixcon/companion-satellite-rs.git";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-  in {
-    nixosConfigurations.streamdesk = mkSystemConfig { inherit nixpkgs; /*hardwareConfig = ./hardware-config.nix;*/ diskConfig = ./disk-config.nix; };
-    nixosConfigurations.streamdeskNoHW = mkSystemConfig { inherit nixpkgs; };
-    nixosConfigurations.streamdeskStableNoHW = mkSystemConfig { nixpkgs = nixpkgs-2605; };
-    packages.vm.x86_64-linux = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.vm;
-    packages.liveCD.x86_64-linux = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.images.iso;
-    packages.liveCDStable.x86_64-linux = self.outputs.nixosConfigurations.streamdeskStableNoHW.config.system.build.images.iso;
-    packages.default.install = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (arch: nixpkgs.legacyPackages.${arch}.writeScriptBin "install" ''
-      #!/bin/sh
-      git clone https://github.com/andir/nixcon-streaming-config nixcon-streaming-config
-      cd nixcon-streaming-config
-      sudo nixos-generate-config --no-filesystems --show-hardware-config > hardware-configuration.nix
-      git add hardware-configuration.nix
-      sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko#disko-install -- --flake .#streamdesk --disk main /dev/nvme0n1
-    '');
+  #  inputs.companion = {
+  #    url = "github:bitfocus/companion/stable-4.0";
+  #    flake = false;
+  #  };
+  #  inputs.ontime = {
+  #    url = "github:cpvalente/ontime/v4";
+  #    flake = false;
+  #  };
+  outputs =
+    { self
+    , nixpkgs
+    , nixpkgs-2605
+    , disko
+    , hws
+    , companion-satellite-rs
+    , treefmt-nix
+    , # ontime,
+      home-manager
+    , ...
+    }:
+    let
 
-    devShells = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: {
-      default =  with nixpkgs.legacyPackages.${arch}; mkShell {
-        nativeBuildInputs = [
-          ffmpeg_7-full
-          (python3.withPackages (p: [
-            p.google-api-python-client
-            p.google-auth
-            p.google-auth-httplib2
-            p.google-auth-oauthlib
-          ]))
-#          (writeShellScriptBin "update-companion" ''
-#            mkdir -p companion
-#            exec ${yarn-berry_4.yarn-berry-fetcher}/bin/yarn-berry-fetcher missing-hashes ${companion}/yarn.lock > companion/missing-hashes.json
-#          '')
-        ];
+      mkSystemConfig =
+        { nixpkgs
+        , hardwareConfig ? null
+        , diskConfig ? null
+        ,
+        }:
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            hws.nixosModules.default
+            ./streamdesk
+            disko.nixosModules.disko
+            home-manager.nixosModules.home-manager
+            ({
+              nixpkgs.overlays = [
+                (self: _: {
+                  mkHwsVendorModule = kernelPackages: kernelPackages.callPackage (hws + "/package-vendor.nix") { };
+                  inherit (companion-satellite-rs.packages.${self.system}) streamdeck-satellite ulanzi-satellite;
+                })
+              ];
+            })
+          ]
+          ++ (if hardwareConfig != null then [ hardwareConfig ] else [ ])
+          ++ (if diskConfig != null then [ diskConfig ] else [ ]);
+        };
+
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+
+      treefmtEval = nixpkgs.lib.genAttrs systems (
+        arch:
+        let
+          pkgs = nixpkgs.legacyPackages.${arch};
+        in
+        treefmt-nix.lib.evalModule pkgs ./treefmt.nix
+      );
+    in
+    {
+      nixosConfigurations.streamdesk = mkSystemConfig {
+        inherit nixpkgs; # hardwareConfig = ./hardware-config.nix;
+        diskConfig = ./disk-config.nix;
       };
-    });
-#    packages.ontime = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: with nixpkgs.legacyPackages.${arch}; stdenv.mkDerivation (finalAttrs: {
-#      pname = "ontime";
-#      version = "4-nix-${ontime.rev}";
-#      src = ontime;
-#      nativeBuildInputs = [
-#        nodejs
-#        pnpm
-#        pnpm.configHook
-#      ];
-#      pnpmDeps = pnpm.fetchDeps {
-#          inherit (finalAttrs) pname version src;
-#          fetcherVersion = 2;
-#          hash = "sha256-8B0MbVDH8jLOXxtm4aqBux/swW6vY0ixpV5oU5IHsm4=";
-#      };
-#      env = {
-#        ELECTRON_SKIP_BINARY_DOWNLOAD = true;
-#        NODE_ENV = "prod";
-#      };
-#      buildPhase = ''
-#        (cd apps/client && pnpm addversion && pnpm build)
-#        (cd apps/server && pnpm addversion && pnpm build:docker)
-#        mkdir -p $out
-#        cp -rv apps/client/build $out/client
-#
-#        cp -rv apps/server/dist $out/server
-#        cp -rv apps/server/src/external $out/external
-#        cp -rv apps/server/src/html $out/html
-#      '';
-#
-#      testPhase = ''
-#        node $out/server/index.cjs --help
-#      '';
-#      passthru.runScript = writeShellScriptBin "ontime" ''
-#        cd ${self.packages.ontime.${arch}}
-#        exec ${nodejs}/bin/node server/docker.cjs "$@"
-#      '';
-#    }));
+      nixosConfigurations.x600 = mkSystemConfig {
+        inherit nixpkgs;
+        hardwareConfig = {
+          imports = [
+            ./streamdesk/asrock-x600-itx.nix
+            ({ networking.hostName = "x600"; })
+          ];
+        };
+        diskConfig = ./disk-config.nix;
+      };
+      nixosConfigurations.streamdeskNoHW = mkSystemConfig { inherit nixpkgs; };
+      nixosConfigurations.streamdeskStableNoHW = mkSystemConfig { nixpkgs = nixpkgs-2605; };
+      packages.x86_64-linux.vm = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.vm;
+      packages.x86_64-linux.liveCD =
+        self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.images.iso;
+      packages.x86_64-linux.liveCDStable =
+        self.outputs.nixosConfigurations.streamdeskStableNoHW.config.system.build.images.iso;
+      packages.x86_64-linux.install = nixpkgs.legacyPackages.x86_64-linux.writeScriptBin "install" ''
+        #!/bin/sh
+        git clone https://github.com/andir/nixcon-streaming-config nixcon-streaming-config
+        cd nixcon-streaming-config
+        sudo nixos-generate-config --no-filesystems --show-hardware-config > hardware-configuration.nix
+        git add hardware-configuration.nix
+        sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko#disko-install -- --flake .#streamdesk --disk main /dev/nvme0n1
+      '';
 
-#    packages.companion = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (arch: with nixpkgs.legacyPackages.${arch}; let
-#      yarn-berry = yarn-berry_4;
-#    in stdenv.mkDerivation (finalAttrs: {
-#      src = companion;
-#      pname = "companion";
-#      version = "4.0-${companion.rev}";
-#      missingHashes = ./companion/missing-hashes.json;
-#
-#
-#      offlineCache = yarn-berry.fetchYarnBerryDeps {
-#        inherit (finalAttrs) src missingHashes;
-#        hash = "sha256-9+unG7z6YpsN7NuVC8b76Uj/I4IRwa7hkpAvN+JrpLI=";
-#      };
-#
-#      patches = [
-#        ./companion/0001-Use-environment-information-for-git-revision-in-vers.patch
-#        ./companion/0002-Remove-binary-copying.patch
-#      ];
-#
-#      env = {
-#        NIX_SRC_REV = companion.rev;
-#        ELECTRON_SKIP_BINARY_DOWNLOAD = true;
-#        npm_config_build_from_source = "true";
-#        NIX_CFLAGS_COMPILE="-I${lib.getDev libusb1}/include/libusb-1.0";
-#        dontUseCmakeConfigure = 1;
-#        npm_config_node_gyp = "${nodejs}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js";
-#        mitmCache = mitm-cache.fetch {
-#            data = {
-#                "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/3.0.1.tar.gz" = {
-#                    hash = "sha256-W5u8orKofGYyyCF5lDjTWOJwBKtSir95hTPBXVCzn4I=";
-#                };
-#            };
-#        };
-#      };
-#
-#      buildInputs = [
-#        python3
-#        systemd
-#        libusb1
-#      ];
-#
-#      ignoreMissingDeps = [ "libc.musl-x86_64.so.1" ];
-#
-#      buildPhase = ''
-#        autoPatchelf node_modules/sass-embedded-linux-*
-#        yarn dist
-#      '';
-#
-#      installPhase = ''
-#        cp -rv dist $out
-#      '';
-#      nativeBuildInputs = [
-#        cmake
-#        nodejs
-#        yarn-berry
-#        yarn-berry.yarnBerryConfigHook
-#        electron
-#        autoPatchelfHook
-#        mitm-cache
-#      ];
-#    }));
-  };
+      checks = {
+        x600 = self.nixosConfigurations.x600.config.system.build.toplevel;
+      };
+      formatter = nixpkgs.lib.genAttrs systems (arch: treefmtEval.${arch}.config.build.wrapper);
+      devShells = nixpkgs.lib.genAttrs systems (arch: {
+        default =
+          with nixpkgs.legacyPackages.${arch};
+          mkShell {
+            nativeBuildInputs = [
+              ffmpeg_7-full
+              (python3.withPackages (p: [
+                p.google-api-python-client
+                p.google-auth
+                p.google-auth-httplib2
+                p.google-auth-oauthlib
+              ]))
+            ];
+          };
+      });
+    };
 }

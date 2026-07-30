@@ -9,7 +9,6 @@
     };
   };
 
-
   services.pipewire = {
     enable = true;
     audio.enable = false;
@@ -20,10 +19,9 @@
     extraPortals = [
     ];
   };
-    
 
   programs.kde-pim.enable = false;
-    security.polkit.extraConfig = ''
+  security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (subject.isInGroup("wheel")) {
         return polkit.Result.YES;
