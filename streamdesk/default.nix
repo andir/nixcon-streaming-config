@@ -146,6 +146,17 @@
     boot.loader.grub.memtest86.enable = true;
   };
 
+  services.web-deck.instances = {
+    local = {
+      companion.host = "172.17.0.2";
+      nginx = {
+        enable = true;
+        domain = "streamdesk.lan";
+        basicAuthFile = pkgs.writeText "streamdesk.htpasswd" "operator:{PLAIN}nixcon";
+      };
+    };
+  };
+
   users.users.root.openssh = config.users.users.nixos.openssh;
   # Use less privileged nixos user
   users.users.nixos = {

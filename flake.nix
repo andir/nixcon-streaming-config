@@ -46,6 +46,7 @@
             ./streamdesk
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
+            companion-satellite-rs.nixosModules.web-deck
             ({
               nixpkgs.overlays = [
                 (self: _: {
