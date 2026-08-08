@@ -26,5 +26,13 @@ in
       "16623:16622"
     ];
   };
+  systemd.services.companion-ipv6 = {
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.socat ];
+    script = ''
+      exec socat TCP6-LISTEN:8000,reuseaddr,fork,ipv6only=1 TCP:localhost:8000
+    '';
+    serviceConfig.DynamicUser = true;
+  };
   networking.firewall.allowedTCPPorts = [ 8000 ];
 }

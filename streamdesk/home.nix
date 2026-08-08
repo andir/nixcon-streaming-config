@@ -82,6 +82,7 @@
                   "time"
                 ];
                 keyword = "ontime";
+                # FIXME: update for 2026
                 url = "http://localhost:4001/editor";
               }
               "separator"
@@ -89,7 +90,7 @@
                 name = "Pads";
                 tags = [ "pad" ];
                 keyword = "pads";
-                url = "https://pad.lassul.us/nixcon-2025-av";
+                url = "https://pad.lassul.us/dc_kC6hEQai20cOIZ5JeTg";
               }
               "separator"
               {
@@ -111,6 +112,9 @@
             };
           };
         };
+      };
+      services.syncthing = {
+        enable = true;
       };
     };
   };

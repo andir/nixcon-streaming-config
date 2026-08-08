@@ -117,10 +117,6 @@
     gimp
   ];
 
-  services.syncthing = {
-    enable = true;
-  };
-
   # Firewall must be of for the fancy stuff like OBS websockets
   networking.firewall.enable = false;
 
@@ -146,16 +142,30 @@
     boot.loader.grub.memtest86.enable = true;
   };
 
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    nssmdns6 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      domain = true;
+      workstation = true;
+    };
+  };
+
   services.web-deck.instances = {
     local = {
-      companion.host = "172.17.0.2";
+      companion.host = "127.0.0.1";
+      port = 16625;
       nginx = {
         enable = true;
-        domain = "streamdesk.lan";
+        domain = "x600.local";
         basicAuthFile = pkgs.writeText "streamdesk.htpasswd" "operator:{PLAIN}nixcon";
       };
     };
   };
+  networking.firewall.allowedTCPPorts = [ 16625 ];
 
   users.users.root.openssh = config.users.users.nixos.openssh;
   # Use less privileged nixos user
