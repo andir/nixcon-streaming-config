@@ -12,7 +12,11 @@
         ExecStart = "${lib.getExe pkgs.streamdeck-satellite}";
       };
     };
-    companion-satellite-ulanzi = {
+
+    # cheap chinese knock-off we don't want to use. It works but
+    # sometimes defaults to some builtin screen an requires a replug /
+    # explicit push of new images.
+    companion-satellite-ulanzi = lib.mkIf false {
       Unit = {
         Description = "Companion satellite rewritten in rust for the ulanzi device";
         After = "graphical-session.target";

@@ -7,7 +7,7 @@
     ./kde
     ./companion
     #    ./ontime.nix
-    ./home.nix
+    ./home
     ./grafana.nix
   ];
 
