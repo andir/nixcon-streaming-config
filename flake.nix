@@ -14,6 +14,7 @@
       url = "git+https://forgejo.rammhold.de/nixcon/companion-satellite-rs.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
   #  inputs.companion = {
   #    url = "github:bitfocus/companion/stable-4.0";
   #    flake = false;
@@ -29,8 +30,8 @@
     , hws
     , companion-satellite-rs
     , treefmt-nix
-    , plasma-manager,
-      home-manager
+    , plasma-manager
+    , home-manager
     , ...
     }:
     let
@@ -58,6 +59,9 @@
                   mkHwsVendorModule = kernelPackages: kernelPackages.callPackage (hws + "/package-vendor.nix") { };
                   inherit (companion-satellite-rs.packages.${self.system}) streamdeck-satellite ulanzi-satellite;
                 })
+              ];
+              environment.systemPackages = [
+                self.packages.x86_64-linux.obs-scene-transporter
               ];
             })
           ]
@@ -107,6 +111,25 @@
         git add hardware-configuration.nix
         sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko#disko-install -- --flake .#streamdesk --disk main /dev/nvme0n1
       '';
+      packages.x86_64-linux.obs-scene-transporter = let pkgs = nixpkgs.legacyPackages.x86_64-linux; in pkgs.python3.pkgs.buildPythonApplication {
+        pname = "obs-scene-transporter";
+        version = "1.2.3.4";
+        src = pkgs.fetchFromGitHub {
+          owner = "stblassitude";
+          repo = "obs-scene-transporter";
+          rev = "be975a342b34546bc340b02b3f0d355cde6d0ef3";
+          hash = "sha256-GfJcLnMdSmogm3fyIdLPAjRjN1Gq8KUvszeWRqjejc8=";
+        };
+
+        postPatch = ''
+          substituteInPlace pyproject.toml \
+            --replace-fail '"setuptools_scm[toml]>=3.4",' "" \
+            --replace-fail "'setuptools_scm_git_archive'" ""
+        '';
+
+        pyproject = true;
+        build-system = with pkgs.python3.pkgs; [ setuptools setuptools-scm ];
+      };
 
       checks = {
         x600 = self.nixosConfigurations.x600.config.system.build.toplevel;
