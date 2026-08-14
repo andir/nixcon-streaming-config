@@ -11,7 +11,7 @@
 
   services.pipewire = {
     enable = true;
-    audio.enable = false;
+    audio.enable = true;
   };
 
   xdg.portal = {

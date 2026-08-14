@@ -4,7 +4,7 @@
     enable = true;
     package =
       (pkgs.obs-studio.override {
-        decklinkSupport = true;
+        decklinkSupport = false;
       }).overrideAttrs
         (old: {
           cmakeBuildType = "RelWithDebInfo";

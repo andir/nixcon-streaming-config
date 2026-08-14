@@ -5,35 +5,53 @@
     users.nixos = {
       home.stateVersion = "26.05";
 
-      imports = [ ./companion-satellite.rs ];
+      imports = [ ./companion-satellite.nix ];
 
-      # ensure KDE doesn't ever go to sleep, disable active corners, ....
-      qt.kde.settings = {
-        kwalletrc = {
-          Wallet = {
-            "Close When Idle" = false;
-            "Close on Screensaver" = false;
-            "Enabled" = false;
-            "Idle Timeout" = 10;
-            "Launch Manager" = false;
-            "Leave Manager Open" = false;
-            "Leave Open" = true;
-            "Prompt on Open" = false;
-            "Use One Wallet" = true;
+
+      programs.plasma = {
+        enable = true;
+
+        kscreenlocker = {
+          autoLock = false;
+          timeout = 0;
+        };
+
+        kwin = {
+          tiling.padding = 4;
+          effects = {
+            desktopSwitching.animation = "off"; # slideEnabled
+            minimization.animation = "off"; # squashEnabled
+            windowOpenClose.animation = "off"; # scaleEnabled
           };
         };
-        kscreenlockerrc = {
-          Daemon = {
-            Autolock = false;
-            Timeout = 0;
-          };
+
+        powerdevil.AC = {
+          powerButtonAction = "nothing"; # PowerButtonAction = 0
+          dimDisplay.enable = false; # DimDisplayWhenIdle=false + IdleTimeoutSec=-1
+          turnOffDisplay.idleTimeout = "never"; # TurnOffDisplayIdleTimeoutSec=-1
         };
-        plamsarc = {
+      };
+
+      programs.plasma.configFile = {
+        kwalletrc.Wallet = {
+          "Close When Idle" = false;
+          "Close on Screensaver" = false;
+          "Enabled" = false;
+          "Idle Timeout" = 10;
+          "Launch Manager" = false;
+          "Leave Manager Open" = false;
+          "Leave Open" = true;
+          "Prompt on Open" = false;
+          "Use One Wallet" = true;
+        };
+
+        plasmarc = {
           OSD.Enabled = false;
-          PlamsaToolTips.Delay = -1;
+          PlasmaToolTips.Delay = -1;
         };
+
         kwinrc = {
-          Effect-overview.BorderActivate = 9;
+          "Effect-overview".BorderActivate = 9;
           Plugins = {
             fadingpopupsEnabled = false;
             fullscreenEnabled = false;
@@ -41,30 +59,15 @@
             logoutEnabled = false;
             maximizeEnabled = false;
             overviewEnabled = false;
-            scaleEnabled = false;
             screenedgeEnabled = false;
-            slideEnabled = false;
             slidingpopupsEnabled = false;
-            squashEnabled = false;
             windowapertureEnabled = false;
           };
-          Tiling.padding = 4;
           Windows = {
             ElectricBorderMaximize = false;
             ElectricBorderTiling = false;
-            XWayland.Scale = 1;
           };
-        };
-        powerdevilrc = {
-          AC.Display = {
-            DimDisplayIdleTimeoutSec = -1;
-            DimDisplayWhenIdle = false;
-            TurnOffDisplayIdleTimeoutSec = -1;
-            TurnOffDisplayWhenIdle = false;
-          };
-          AC.SuspendAndShutdown = {
-            PowerButtonAction = 0;
-          };
+          Xwayland.Scale = 1;
         };
       };
 

@@ -1,9 +1,12 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  inputs.nixpkgs-2605.url = "github:nixos/nixpkgs/nixos-26.05";
   inputs.disko.url = "github:nix-community/disko";
-  inputs.home-manager-2605.url = "github:nix-community/home-manager/release-26.05";
   inputs.home-manager.url = "github:nix-community/home-manager";
+  inputs.plasma-manager = {
+    url = "github:nix-community/plasma-manager";
+    inputs.home-manager.follows = "home-manager";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
   inputs.hws.url = "path:/home/andi/dev/private/unisheen-capture-card/unisheen";
   inputs.companion-satellite-rs =
@@ -22,12 +25,11 @@
   outputs =
     { self
     , nixpkgs
-    , nixpkgs-2605
     , disko
     , hws
     , companion-satellite-rs
     , treefmt-nix
-    , # ontime,
+    , plasma-manager,
       home-manager
     , ...
     }:
@@ -46,6 +48,9 @@
             ./streamdesk
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
+            ({
+              home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ];
+            })
             companion-satellite-rs.nixosModules.web-deck
             ({
               nixpkgs.overlays = [
@@ -89,7 +94,6 @@
         diskConfig = ./disk-config.nix;
       };
       nixosConfigurations.streamdeskNoHW = mkSystemConfig { inherit nixpkgs; };
-      nixosConfigurations.streamdeskStableNoHW = mkSystemConfig { nixpkgs = nixpkgs-2605; };
       packages.x86_64-linux.vm = self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.vm;
       packages.x86_64-linux.liveCD =
         self.outputs.nixosConfigurations.streamdeskNoHW.config.system.build.images.iso;

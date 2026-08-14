@@ -3,7 +3,7 @@
   nixpkgs.config.allowUnfree = true;
   imports = [
     ./obs
-    ./decklink
+    #./decklink
     ./kde
     ./companion
     #    ./ontime.nix
@@ -71,7 +71,7 @@
     nano
     pciutils
 
-    blackmagic-desktop-video
+    #blackmagic-desktop-video
     scarlett2
     alsa-scarlett-gui
 
@@ -88,30 +88,30 @@
     usbutils
     util-linux
 
-    (ffmpeg_7-full.overrideAttrs (
-      {
-        buildInputs,
-        configureFlags,
-        postFixup ? "",
-        nativeBuildInputs ? [ ],
-        ...
-      }:
-      {
-        buildInputs = buildInputs ++ [ blackmagic-desktop-video ];
-        nativeBuildInputs = nativeBuildInputs ++ [ pkgs.makeWrapper ];
-        configureFlags = configureFlags ++ [
-          "--enable-decklink"
-          "--enable-nonfree"
-          "--extra-cflags=-I${decklink-sdk}"
-        ];
-        postFixup = ''
-          ${postFixup}
-          wrapProgram $bin/bin/ffmpeg --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
-          wrapProgram $bin/bin/ffprobe --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
-          wrapProgram $bin/bin/ffplay --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
-        '';
-      }
-    ))
+    #(ffmpeg_7-full.overrideAttrs (
+    #  {
+    #    buildInputs,
+    #    configureFlags,
+    #    postFixup ? "",
+    #    nativeBuildInputs ? [ ],
+    #    ...
+    #  }:
+    #  {
+    #    buildInputs = buildInputs ++ [ blackmagic-desktop-video ];
+    #    nativeBuildInputs = nativeBuildInputs ++ [ pkgs.makeWrapper ];
+    #    configureFlags = configureFlags ++ [
+    #      "--enable-decklink"
+    #      "--enable-nonfree"
+    #      "--extra-cflags=-I${decklink-sdk}"
+    #    ];
+    #    postFixup = ''
+    #      ${postFixup}
+    #      wrapProgram $bin/bin/ffmpeg --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
+    #      wrapProgram $bin/bin/ffprobe --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
+    #      wrapProgram $bin/bin/ffplay --prefix LD_LIBRARY_PATH : "${lib.getLib blackmagic-desktop-video}/lib/"
+    #    '';
+    #  }
+    #))
 
     inkscape
     gimp
