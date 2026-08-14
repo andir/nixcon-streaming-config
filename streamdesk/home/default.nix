@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -10,6 +11,24 @@
 
       programs.plasma = {
         enable = true;
+
+        workspace.wallpaper =
+          let
+
+            rainbowLogo = pkgs.fetchurl {
+              url = "https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-rainbow.svg";
+              hash = "sha256-gMeJgiSSA5hFwtW3njZQAd4OHji6kbRCJKVoN6zsRbY=";
+            };
+
+            rainbowWallpaper = pkgs.runCommand "nix-rainbow-wallpaper.png"
+              {
+                nativeBuildInputs = with pkgs; [ librsvg imagemagick ];
+              } ''
+              rsvg-convert -h 1200 ${rainbowLogo} -o logo.png
+              magick logo.png -background '#2e3440' -gravity center -extent 3840x2160 $out
+            '';
+          in
+          rainbowWallpaper;
 
         kscreenlocker = {
           autoLock = false;
