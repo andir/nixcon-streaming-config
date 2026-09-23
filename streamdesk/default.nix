@@ -6,7 +6,7 @@
     #./decklink
     ./kde
     ./companion
-    #    ./ontime.nix
+    #./ontime.nix
     ./home
     ./grafana.nix
   ];

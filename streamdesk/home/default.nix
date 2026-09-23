@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -7,6 +7,53 @@
       home.stateVersion = "26.05";
 
       imports = [ ./companion-satellite.nix ];
+
+      home.packages = [ pkgs.qpwgraph pkgs.helvum ];
+
+      services.pipewire = {
+        enable = true;
+        configs."90-behringer-wing" =
+        let
+          devices = {
+            wing-a = "alsa_input.usb-BEHRINGER_WING_0100RRC0603AEV214-00.multichannel-input"; # hrmny
+          };
+          mkDevice = { name, description, sources, object }: {
+            name = "libpipewire-module-loopback";
+            args = {
+              node.description = description;
+              capture.props =
+                {
+                  node.name = "capture.${name}";
+                  media.class = "Stream/Input/Audio";
+                  audio.position = sources;
+                  stream.dont-remix = true;
+                  target.object = object;
+                  node.passive = true;
+                };
+              playback.props = {
+                node.name = name;
+                node.description = description;
+                media.class = "Audio/Source";
+                audio.position = [ "FL" "FR" ];
+              };
+            };
+          };
+
+          num_pairs = 4;
+          channels = wing: object: lib.genList
+            (n:
+              let a = toString (n * 2); b = toString ((n * 2) + 1); in {
+                description = "${wing} Input ${a}/${b}";
+                name = "${wing}-pair-${toString n}";
+                sources = [ "AUX${a}" "AUX${b}" ];
+                inherit object;
+              })
+            num_pairs;
+        in
+        {
+          "context.modules" = lib.map mkDevice (lib.flatten (lib.mapAttrsToList (wing: object: channels wing object) devices));
+        };
+      };
 
 
       programs.plasma = {
